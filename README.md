@@ -3,6 +3,8 @@
 GPU microbenchmark: KV-cache attention (MHA, MQA, GQA) across sequence lengths.
 Measures effective memory bandwidth to show why decode is memory-bound.
 
+![Results](results/compare.png)
+
 ## Usage
 
 ```
