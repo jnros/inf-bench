@@ -3,28 +3,29 @@ import glob
 import os
 import sys
 
-# Theoretical peak memory bandwidth (GB/s) for known GPUs.
+# Theoretical peak memory bandwidth (GB/s) per GPU.
 # Matched against gpu column (case-insensitive), most specific first.
+# Sources: results/sources.txt
 PEAK_BW = [
-	("h100 80gb hbm3",  3350),	# H100 SXM
-	("h100 pcie",       2039),
-	("h100 nvl",        3350),
-	("a100-sxm",        2039),
-	("a100-pcie-80",    2039),
-	("a100-pcie-40",    1555),
-	("a100",            2039),
-	("a10g",             600),
-	("rtx 2060",         336),
-	("rtx 3060",         360),
-	("rtx 3070",         448),
-	("rtx 3080",         760),
-	("rtx 3090",         936),
-	("rtx 4070",         504),
-	("rtx 4080",         717),
-	("rtx 4090",        1008),
-	("l40s",             864),
-	("l40",              864),
-	("l4",               300),
+	("h100 80gb hbm3",  3350),	# SXM5 80GB HBM3
+	("h100 pcie",       2039),	# PCIe 80GB HBM2e
+	("h100 nvl",        3938),	# NVL 94GB HBM3
+	("a100-sxm",        2039),	# SXM4 80GB HBM2e
+	("a100-pcie-80",    1935),	# PCIe 80GB HBM2e
+	("a100-pcie-40",    1555),	# PCIe 40GB HBM2
+	("a100",            2039),	# SXM fallback
+	("a10g",             600),	# 24GB GDDR6 384-bit
+	("rtx 2060",         336),	# 192-bit @ 14 Gbps
+	("rtx 3060",         360),	# 192-bit @ 15 Gbps
+	("rtx 3070",         448),	# 256-bit @ 14 Gbps
+	("rtx 3080",         760),	# 320-bit @ 19 Gbps GDDR6X
+	("rtx 3090",         936),	# 384-bit @ 19.5G GDDR6X
+	("rtx 4070",         504),	# 192-bit @ 21 Gbps GDDR6X
+	("rtx 4080",         717),	# 256-bit @ 22.4G GDDR6X
+	("rtx 4090",        1008),	# 384-bit @ 21 Gbps GDDR6X
+	("l40s",             864),	# 384-bit GDDR6 ECC
+	("l40",              864),	# 384-bit GDDR6 ECC
+	("l4",               300),	# 192-bit GDDR6
 ]
 
 def match_peak(gpu_name):

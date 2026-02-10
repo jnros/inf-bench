@@ -1,0 +1,92 @@
+Theoretical peak memory bandwidth sources
+==========================================
+
+Each entry: GPU, bandwidth used, source document, relevant quote/derivation.
+
+H100 SXM5 80GB HBM3 — 3350 GB/s
+  NVIDIA H100 Tensor Core GPU product page
+  https://www.nvidia.com/en-us/data-center/h100/
+  Spec table lists "3.35 TB/s" for H100 SXM.
+
+H100 PCIe 80GB HBM2e — 2039 GB/s
+  NVIDIA H100 PCIe GPU Product Brief (PB-11133-001)
+  https://www.nvidia.com/content/dam/en-zz/Solutions/gtcs22/data-center/h100/PB-11133-001_v01.pdf
+  Lists "2 TB/s". Precise: 1593 MHz * 2 * 5120-bit / 8 = 2039 GB/s.
+
+H100 NVL 94GB HBM3 — 3938 GB/s
+  NVIDIA H100 NVL GPU Product Brief (PB-11773-001)
+  https://www.nvidia.com/content/dam/en-zz/Solutions/Data-Center/h100/PB-11773-001_v01.pdf
+  Also confirmed on NVIDIA H100 product page ("3.9 TB/s" for NVL variant).
+  NVIDIA part 900-21010-0020-000 listing: "Memory Bandwidth 3938GB/s"
+  https://www.serversupply.com/GPU/HBM3/94GB/NVIDIA/900-21010-0020-000_395877.htm
+
+A100 SXM4 80GB HBM2e — 2039 GB/s
+  NVIDIA A100 80GB Tensor Core GPU Datasheet
+  https://www.nvidia.com/content/dam/en-zz/Solutions/Data-Center/a100/pdf/a100-80gb-datasheet-update-nvidia-us-1521051-r2-web.pdf
+  SXM4 column: "2039 GB/s".
+
+A100 PCIe 80GB HBM2e — 1935 GB/s
+  NVIDIA A100 80GB PCIe GPU Product Brief (PB-10577-001)
+  https://www.nvidia.com/content/dam/en-zz/Solutions/Data-Center/a100/pdf/PB-10577-001_v02.pdf
+  Lists "up to 1.94 TB/s". Also confirmed in Lenovo ThinkSystem product guide:
+  https://lenovopress.lenovo.com/lp1734-thinksystem-nvidia-a100-pcie-40-gpu
+  Table 2: A100 80GB PCIe "Memory Bandwidth: 1,935 GB/s".
+
+A100 PCIe 40GB HBM2 — 1555 GB/s
+  NVIDIA A100 80GB Tensor Core GPU Datasheet (same as above, PCIe column for 40GB)
+  https://www.nvidia.com/content/dam/en-zz/Solutions/Data-Center/a100/pdf/a100-80gb-datasheet-update-nvidia-us-1521051-r2-web.pdf
+
+A10G 24GB GDDR6 — 600 GB/s
+  AWS NVIDIA A10G Datasheet
+  https://d1.awsstatic.com/product-marketing/ec2/NVIDIA_AWS_A10G_DataSheet_FINAL_02_17_2022.pdf
+  "600.2 GB/s". 384-bit @ 12.5 Gbps.
+
+RTX 2060 6GB GDDR6 — 336 GB/s
+  NVIDIA GeForce RTX 2060 product page
+  https://www.nvidia.com/en-us/geforce/graphics-cards/rtx-2060/
+  192-bit @ 14 Gbps GDDR6. 192 * 14 / 8 = 336.
+
+RTX 3060 12GB GDDR6 — 360 GB/s
+  NVIDIA GeForce RTX 30 Series product page
+  https://www.nvidia.com/en-us/geforce/graphics-cards/30-series/
+  192-bit @ 15 Gbps GDDR6. 192 * 15 / 8 = 360.
+
+RTX 3070 8GB GDDR6 — 448 GB/s
+  Same source as RTX 3060.
+  256-bit @ 14 Gbps GDDR6. 256 * 14 / 8 = 448.
+
+RTX 3080 10GB GDDR6X — 760 GB/s
+  Same source as RTX 3060.
+  320-bit @ 19 Gbps GDDR6X. 320 * 19 / 8 = 760.
+
+RTX 3090 24GB GDDR6X — 936 GB/s
+  Same source as RTX 3060.
+  384-bit @ 19.5 Gbps GDDR6X. 384 * 19.5 / 8 = 936.
+
+RTX 4070 12GB GDDR6X — 504 GB/s
+  NVIDIA GeForce RTX 40 Series product page
+  https://www.nvidia.com/en-us/geforce/graphics-cards/40-series/
+  192-bit @ 21 Gbps GDDR6X. 192 * 21 / 8 = 504.
+
+RTX 4080 16GB GDDR6X — 717 GB/s
+  Same source as RTX 4070.
+  256-bit @ 22.4 Gbps GDDR6X. 256 * 22.4 / 8 = 716.8, rounded to 717.
+
+RTX 4090 24GB GDDR6X — 1008 GB/s
+  Same source as RTX 4070.
+  384-bit @ 21 Gbps GDDR6X. 384 * 21 / 8 = 1008.
+
+L40S 48GB GDDR6 ECC — 864 GB/s
+  NVIDIA L40S Datasheet
+  https://www.nvidia.com/content/dam/en-zz/Solutions/Data-Center/l40s/l40s-datasheet.pdf
+  Also confirmed via Cisco:
+  https://www.cisco.com/c/dam/en/us/products/collateral/servers-unified-computing/ucs-c-series-rack-servers/nvidia-l40s-ucsc-gpu-l40s.pdf
+
+L40 48GB GDDR6 ECC — 864 GB/s
+  NVIDIA L40 Datasheet
+  https://www.nvidia.com/content/dam/en-zz/Solutions/design-visualization/support-guide/NVIDIA-L40-Datasheet-January-2023.pdf
+
+L4 24GB GDDR6 — 300 GB/s
+  NVIDIA L4 product page
+  https://www.nvidia.com/en-us/data-center/l4/
+  Spec table lists "300 GB/s".
