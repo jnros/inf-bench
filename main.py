@@ -27,14 +27,26 @@ def main():
 
     for i in S:
         torch.cuda.reset_peak_memory_stats()
+
+        start = torch.cuda.Event(enable_timing=True)
+        end = torch.cuda.Event(enable_timing=True)
+
         k_cache = torch.empty((B, H, i, D), device=device, dtype=dtype) 
         v_cache = torch.empty((B, H, i, D), device=device, dtype=dtype) 
         kvbytes = ((k_cache.numel() + v_cache.numel()) * k_cache.element_size())
 
         lonely_q = torch.empty((B, H, 1, D), device=device, dtype=dtype) 
+
+        # warmup
         scores = torch.matmul(lonely_q, k_cache.transpose(2,3))
+        torch.cuda.synchronize()
 
         torch.cuda.synchronize()
+        start.record()
+        scores = torch.matmul(lonely_q, k_cache.transpose(2,3))
+        end.record()
+        end.synchronize()
+
         peak_alloc = torch.cuda.max_memory_allocated()
 
         print(
@@ -45,5 +57,10 @@ def main():
         print(
             f"scores={tuple(scores.shape)}  "
             )
+
+        print(
+                f"Execution time: {((start.elapsed_time(end))):0.3f} ms"
+            )
+
 if __name__ == "__main__":
     main()
