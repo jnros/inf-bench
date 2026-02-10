@@ -1,18 +1,9 @@
 # inf-bench
 
-**WORK IN PROGRESS** — everything here is experimental and subject to change.
-
-GPU microbenchmark for KV-cache attention scaling. Full decode attention
-(Q@K^T, scale, softmax, awts@V) timed across sequence lengths.
-
-## Requirements
-
-- CUDA GPU
-- Python 3.11+
-- [uv](https://github.com/astral-sh/uv)
+GPU microbenchmark: KV-cache attention (MHA, MQA, GQA) across sequence lengths.
 
 ## Usage
 
 ```
-uv run main.py
+uv run main.py    # requires CUDA GPU, Python 3.11+, uv
 ```
