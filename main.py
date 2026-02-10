@@ -32,11 +32,11 @@ def main():
         start = torch.cuda.Event(enable_timing=True)
         end = torch.cuda.Event(enable_timing=True)
 
-        k_cache = torch.empty((B, H, i, D), device=device, dtype=dtype) 
-        v_cache = torch.empty((B, H, i, D), device=device, dtype=dtype) 
+        k_cache = torch.randn((B, H, i, D), device=device, dtype=dtype)
+        v_cache = torch.randn((B, H, i, D), device=device, dtype=dtype) 
         kvbytes = ((k_cache.numel() + v_cache.numel()) * k_cache.element_size())
 
-        lonely_q = torch.empty((B, H, 1, D), device=device, dtype=dtype) 
+        lonely_q = torch.randn((B, H, 1, D), device=device, dtype=dtype) 
 
         # warmup
         scores = torch.matmul(lonely_q, k_cache.transpose(2,3))
