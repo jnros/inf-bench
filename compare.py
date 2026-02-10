@@ -4,27 +4,32 @@ import os
 import sys
 
 # Theoretical peak memory bandwidth (GB/s) for known GPUs.
-# Substring-matched against gpu column, case-insensitive.
-PEAK_BW = {
-	"rtx 2060":    336,
-	"rtx 3060":    360,
-	"rtx 3070":    448,
-	"rtx 3080":    760,
-	"rtx 3090":    936,
-	"rtx 4070":    504,
-	"rtx 4080":    717,
-	"rtx 4090":   1008,
-	"a100":       2039,
-	"a10g":        600,
-	"h100":       3350,
-	"l4":          300,
-	"l40":         864,
-	"l40s":        864,
-}
+# Matched against gpu column (case-insensitive), most specific first.
+PEAK_BW = [
+	("h100 80gb hbm3",  3350),	# H100 SXM
+	("h100 pcie",       2039),
+	("h100 nvl",        3350),
+	("a100-sxm",        2039),
+	("a100-pcie-80",    2039),
+	("a100-pcie-40",    1555),
+	("a100",            2039),
+	("a10g",             600),
+	("rtx 2060",         336),
+	("rtx 3060",         360),
+	("rtx 3070",         448),
+	("rtx 3080",         760),
+	("rtx 3090",         936),
+	("rtx 4070",         504),
+	("rtx 4080",         717),
+	("rtx 4090",        1008),
+	("l40s",             864),
+	("l40",              864),
+	("l4",               300),
+]
 
 def match_peak(gpu_name):
 	low = gpu_name.lower()
-	for substr, bw in PEAK_BW.items():
+	for substr, bw in PEAK_BW:
 		if substr in low:
 			return bw
 	return None
@@ -107,7 +112,46 @@ def plot(gpus, outpath="results/compare.png"):
 	plt.close(fig)
 	print(f"saved {outpath}")
 
+def plot_pct(gpus, outpath="results/compare-pct.png"):
+	import matplotlib
+	matplotlib.use("Agg")
+	import matplotlib.pyplot as plt
+
+	mha = {}
+	for gpu, rows in gpus.items():
+		mha[gpu] = [r for r in rows if r["label"] == "MHA"]
+
+	fig, ax = plt.subplots(figsize=(8, 5))
+	colors = plt.rcParams["axes.prop_cycle"].by_key()["color"]
+
+	for ci, (gpu, rows) in enumerate(sorted(mha.items())):
+		xs = sorted(int(r["S"]) for r in rows)
+		by_s = {int(r["S"]): r for r in rows}
+		color = colors[ci % len(colors)]
+		peak = match_peak(gpu)
+		if not peak:
+			continue
+		bw = [float(by_s[s]["bw_gbs"]) for s in xs]
+		pct = [b / peak * 100 for b in bw]
+		ax.plot(xs, pct, "o-", label=gpu, color=color)
+
+	ax.axhline(100, linestyle="--", color="grey",
+		   alpha=0.5, linewidth=1)
+	ax.set_xscale("log", base=2)
+	ax.set_xlabel("sequence length")
+	ax.set_ylabel("% of peak bandwidth")
+	ax.legend(fontsize=8)
+	ax.grid(True, alpha=0.3)
+	ax.set_title("cross-GPU decode attention (MHA)", fontsize=14)
+	fig.text(0.5, 0.01, "math SDP only (flash/mem-efficient disabled)",
+		 ha="center", fontsize=9, style="italic")
+	plt.tight_layout(rect=[0, 0.03, 1, 0.97])
+	fig.savefig(outpath, dpi=150)
+	plt.close(fig)
+	print(f"saved {outpath}")
+
 if __name__ == "__main__":
 	gpus = load_csvs()
 	print(f"loaded {len(gpus)} GPU(s): {', '.join(sorted(gpus))}")
 	plot(gpus)
+	plot_pct(gpus)
