@@ -14,8 +14,9 @@ def main():
 
     # tiny config
     B = 1
-    H = 1
+    H = 8
     D = 64
+    T = 128
     dtype = torch.float16
     device="cuda"
 
@@ -43,11 +44,18 @@ def main():
 
         torch.cuda.synchronize()
         start.record()
-        scores = torch.matmul(lonely_q, k_cache.transpose(2,3))
+        for decode_t in range(T):
+            scores = torch.matmul(lonely_q, k_cache.transpose(2,3))
+            scaled_logits = scores / (D ** 0.5)
+            awts = torch.nn.functional.softmax(scaled_logits, dim=-1)
+            Z = torch.matmul(awts, v_cache)
         end.record()
         end.synchronize()
 
         peak_alloc = torch.cuda.max_memory_allocated()
+
+        time_tot = start.elapsed_time(end)
+        time_unit = time_tot / T;
 
         print(
             f"i={i:5d} k={tuple(k_cache.shape)}  "
@@ -55,11 +63,11 @@ def main():
             )
 
         print(
-            f"scores={tuple(scores.shape)}  "
+            f"scores={tuple(scores.shape)} awts={tuple(awts.shape)}  "
             )
 
         print(
-                f"Execution time: {((start.elapsed_time(end))):0.3f} ms"
+                f"Execution time: {time_unit:0.3f} ms / tok"
             )
 
 if __name__ == "__main__":
