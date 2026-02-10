@@ -21,10 +21,10 @@ uv run main.py    # requires CUDA GPU
 
 ## Architecture
 
-`main.py` runs a loop over sequence lengths [256..8192]. For each:
-1. Allocates KV cache tensors `(B,H,S,D)` and a single query `(B,H,1,D)`
+`main.py` loops over sequence lengths [256..8192]. Per length:
+1. Alloc KV cache `(B,H,S,D)` + query `(B,H,1,D)`
 2. Warmup matmul + sync
-3. Timed `Q @ K^T` via CUDA events
-4. Reports KV size, peak alloc, execution time
+3. Timed loop (T iters): Q@K^T, scale, softmax, awts@V — full decode attention
+4. Reports KV size, peak alloc, ms/tok
 
-Config: B=1, H=1, D=64, float16. No CLI args yet.
+Config: B=1, H=8, D=64, T=128, float16. No CLI args yet.

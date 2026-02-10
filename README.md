@@ -2,8 +2,8 @@
 
 **WORK IN PROGRESS** — everything here is experimental and subject to change.
 
-GPU microbenchmark for KV-cache attention scaling. Measures `Q @ K^T` matmul
-time and memory across sequence lengths.
+GPU microbenchmark for KV-cache attention scaling. Full decode attention
+(Q@K^T, scale, softmax, awts@V) timed across sequence lengths.
 
 ## Requirements
 
