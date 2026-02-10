@@ -55,40 +55,43 @@ def plot(gpus, outpath="results/compare.png"):
 	for gpu, rows in gpus.items():
 		mha[gpu] = [r for r in rows if r["label"] == "MHA"]
 
-	# Shared seqlens (intersection)
-	seqsets = [set(int(r["S"]) for r in rows) for rows in mha.values()]
-	shared = sorted(set.intersection(*seqsets))
-	if not shared:
-		print("no shared sequence lengths", file=sys.stderr)
-		sys.exit(1)
-
 	fig, axes = plt.subplots(1, 3, figsize=(15, 5))
-	panels = [
-		(0, "ms_tok", "ms / tok"),
-		(1, "kv_mb", "KV cache (MB)"),
-		(2, "bw_gbs", "bandwidth (GB/s)"),
-	]
-
 	colors = plt.rcParams["axes.prop_cycle"].by_key()["color"]
 
 	for ci, (gpu, rows) in enumerate(sorted(mha.items())):
+		xs = sorted(int(r["S"]) for r in rows)
 		by_s = {int(r["S"]): r for r in rows}
-		xs = shared
 		color = colors[ci % len(colors)]
-
-		for idx, key, ylabel in panels:
-			ax = axes[idx]
-			ys = [float(by_s[s][key]) for s in xs]
-			ax.plot(xs, ys, "o-", label=gpu, color=color)
-
-		# theoretical peak bandwidth line
 		peak = match_peak(gpu)
-		if peak:
-			axes[2].axhline(peak, linestyle="--", color=color,
-					alpha=0.5, linewidth=1,
-					label=f"{gpu} peak ({peak})")
 
-	for idx, key, ylabel in panels:
+		ms = [float(by_s[s]["ms_tok"]) for s in xs]
+		bw = [float(by_s[s]["bw_gbs"]) for s in xs]
+
+		# panel 0: ms/tok
+		axes[0].plot(xs, ms, "o-", label=gpu, color=color)
+
+		# panel 1: absolute bandwidth
+		axes[1].plot(xs, bw, "o-", label=gpu, color=color)
+		if peak:
+			axes[1].axhline(peak, linestyle="--", color=color,
+					alpha=0.5, linewidth=1,
+					label=f"peak ({peak})")
+
+		# panel 2: % of peak bandwidth
+		if peak:
+			pct = [b / peak * 100 for b in bw]
+			axes[2].plot(xs, pct, "o-", label=gpu, color=color)
+
+	# panel 2: 100% reference line
+	axes[2].axhline(100, linestyle="--", color="grey",
+			alpha=0.5, linewidth=1)
+
+	labels = [
+		(0, "ms / tok"),
+		(1, "bandwidth (GB/s)"),
+		(2, "% of peak bandwidth"),
+	]
+	for idx, ylabel in labels:
 		ax = axes[idx]
 		ax.set_xscale("log", base=2)
 		ax.set_xlabel("sequence length")
