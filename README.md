@@ -19,4 +19,4 @@ FlashAttention and MQA already improve this. Future architectures promise KV cac
 
 Repo and raw data: [https://github.com/jnros/inf-bench](https://github.com/jnros/inf-bench)
 
-<img width="2250" height="750" alt="compare" src="https://gist.github.com/user-attachments/assets/0fa553a9-b75d-43e4-bb93-7b2a76bbd14c" />
+![charts](results/compare.png)
