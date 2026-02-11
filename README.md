@@ -1,22 +1,22 @@
-# inf-bench
+# Inference (in)efficiency
 
-GPU microbenchmark: KV-cache attention (MHA, MQA, GQA) across sequence lengths.
-Measures effective memory bandwidth to show why decode is memory-bound.
+LLM inference is bottlenecked by the decode operation. I benchmarked decode attention across four GPUs. The gap between what these chips can do and what decode lets them do is the takeaway.
 
-![Results](results/compare.png)
+## KV Cache
+Two things make decode expensive. First, the sizeable KV cache must be pinned in high bandwidth memory, where it must remain for the life of the request. Each new token attends to every previous token's keys and values. None of it can be evicted until the request is done.
 
-## Usage
+Second, the decode operation itself is scattered. HBM is built for long contiguous reads, but decode does not use these. Consider decode attention: a row of Keys gets applied to current Query (small, single token), scores get softmaxed, then applied to a Values row, then all ops wait for a sync. Piecemeal, messy, stops and starts.
 
-```
-uv run main.py      # requires CUDA GPU, Python 3.11+, uv
-uv run compare.py   # after collecting results from multiple GPUs
-```
+As a result, expensive memory ends up babysitting and GPU compute gets starved.
 
-Outputs (per GPU):
-- `results/{gpu-slug}.csv` — structured data for all runs
-- `results/{gpu-slug}.png` — 3-panel chart (ms/tok, KV cache MB, bandwidth GB/s)
+## Tool
+I built a benchmark to measure directly. Decode attention from scratch, no optimizations, across four GPUs (RTX, A100, H100 PCIe, H100 SXM).
 
-Cross-GPU comparison:
-- `results/compare.png` — MHA-only overlay with theoretical peak BW lines
+## Results
+Charts shows token serve speed, bandwidth, and % of peak bandwidth utilized. On bandwidth charts, note that bandwidth grows over sequence length but then moderates/flattens. Even the H100 SXM (3.35 TB/s peak) sits below 30%. Scale to 50,000 GPUs, and the white space represents billions in underutilized compute.
 
-Seqlens extend to 65536 automatically on GPUs with >=24GB VRAM.
+FlashAttention and MQA already improve this. Future architectures promise KV cache offloading to DRAM and SSD (see [Deepseek Engram](https://gist.github.com/jnros/92ed1e5b5af05d3a2fd353b4537af744)). The entire optimization stack is trying to close this gap.
+
+Repo and raw data: [https://github.com/jnros/inf-bench](https://github.com/jnros/inf-bench)
+
+<img width="2250" height="750" alt="compare" src="https://gist.github.com/user-attachments/assets/0fa553a9-b75d-43e4-bb93-7b2a76bbd14c" />
