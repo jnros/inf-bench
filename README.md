@@ -17,6 +17,4 @@ Charts shows token serve speed, bandwidth, and % of peak bandwidth utilized. On 
 
 FlashAttention and MQA already improve this. Future architectures promise KV cache offloading to DRAM and SSD (see [Deepseek Engram](https://gist.github.com/jnros/92ed1e5b5af05d3a2fd353b4537af744)). The entire optimization stack is trying to close this gap.
 
-Repo and raw data: [https://github.com/jnros/inf-bench](https://github.com/jnros/inf-bench)
-
 ![charts](results/compare.png)
